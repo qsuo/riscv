@@ -26,14 +26,73 @@ uint32_t Decoder::applyMask(uint32_t raw, uint32_t mask)
     return (raw & mask) >> this->findFirstUp(mask);
 }
 
-#define GET_FIELD(field, what) decoding.#field = this->applyMask(encoding, masks[what])
-
-Decoder::Decoding Decoder::decode(uint32_t encoding)
+uint32_t Decoder::Decoding::getIImm()
 {
-    Decoding decoding;
-    decoding.opcode = this->applyMask(encoding, masks[OPCODE]);
-    GET_FIELD(opcode, OPCODE);
+    return I_imm11_0;
 }
+
+uint32_t Decoder::Decoding::getSImm()
+{
+    uint32_t imm4_0 = S_imm4_0;
+    uint32_t imm11_5 = S_imm11_5 << 5;
+    uint32_t imm = imm4_0 | imm11_5;
+    return imm;
+}
+
+uint32_t Decoder::Decoding::getBImm()
+{
+    uint32_t imm12 = B_imm12 << 11;
+    uint32_t imm10_5 = B_imm10_5 << 4;
+    uint32_t imm4_1 = B_imm4_1;
+    uint32_t imm11 = B_imm11 << 10;
+    uint32_t imm = imm4_1 | imm10_5 | imm11 | imm12;
+    return imm;
+}
+
+uint32_t Decoder::Decoding::getUImm()
+{
+    return U_imm31_12;
+}
+
+uint32_t Decoder::Decoding::getJImm()
+{
+    uint32_t imm10_1 = J_imm10_1;
+    uint32_t imm11 = J_imm11 << 10;
+    uint32_t imm19_12 = J_imm19_12 << 11;
+    uint32_t imm20 = J_imm20 << 19;
+    uint32_t imm = imm10_1 | imm11 | imm19_12 | imm20;
+    return imm;
+}
+
+
+Decoder::Decoding Decoder::getDecoding(uint32_t encoding)
+{
+    Decoding decoding = {
+        .opcode     = this->applyMask(encoding, Mask::OPCODE),
+        .rd         = this->applyMask(encoding, Mask::RD),
+        .funct3     = this->applyMask(encoding, Mask::FUNCT3),
+        .rs1        = this->applyMask(encoding, Mask::RS1),
+        .rs2        = this->applyMask(encoding, Mask::RS2),
+        .funct7     = this->applyMask(encoding, Mask::FUNCT7),
+        .I_imm11_0  = this->applyMask(encoding, Mask::I_IMM11_0),
+        .S_imm11_5  = this->applyMask(encoding, Mask::S_IMM11_5),
+        .S_imm4_0   = this->applyMask(encoding, Mask::S_IMM4_0),
+        .B_imm12    = this->applyMask(encoding, Mask::B_IMM12),
+        .B_imm10_5  = this->applyMask(encoding, Mask::B_IMM10_5),
+        .B_imm4_1   = this->applyMask(encoding, Mask::B_IMM4_1),
+        .B_imm11    = this->applyMask(encoding, Mask::B_IMM11),
+        .U_imm31_12 = this->applyMask(encoding, Mask::U_IMM31_12),
+        .J_imm20    = this->applyMask(encoding, Mask::J_IMM20),
+        .J_imm10_1  = this->applyMask(encoding, Mask::J_IMM10_1),
+        .J_imm11    = this->applyMask(encoding, Mask::J_IMM11),
+        .J_imm19_12 = this->applyMask(encoding, Mask::J_IMM19_12)
+    };
+
+    return decoding; 
+}
+
+
+
 
 
 
