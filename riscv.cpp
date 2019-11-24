@@ -10,14 +10,3 @@ Riscv::Riscv(uint32_t memorySize):
     memory(memorySize)
 {}
 
-void Riscv::load(const char* filePath)
-{
-
-}
-
-void Riscv::run()
-{
-    //
-}
-
-
