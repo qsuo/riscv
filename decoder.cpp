@@ -1,16 +1,14 @@
 
-#include "decoder.h"
-
-
-//Instruction* Decoder::decode(uint32_t encoding)
-         
 #include <iostream>
+
+#include "decoder.h"
+         
 
 int Decoder::findFirstUp(uint32_t raw)
 {
     int bit = 0;
     uint32_t mask = 0x1;
-    int nbit = sizeof(uint32_t) * BYTE_SIZE;
+    int nbit = sizeof(raw) * BYTE_SIZE;
     int pos = 0;
     for(pos = 0; pos < nbit && bit == 0; pos++)
     {   
@@ -64,6 +62,25 @@ uint32_t Decoder::Decoding::getJImm()
     return imm;
 }
 
+uint32_t Decoder::Decoding::getImm(Type type)
+{
+    switch(type)
+    {
+        case I:
+            return getIImm();
+        case S:
+            return getSImm();
+        case B:
+            return getBImm();
+        case U:
+            return getUImm();
+        case J:
+            return getJImm();
+        default:
+            return 0;
+    }
+}
+
 
 Decoder::Decoding Decoder::getDecoding(uint32_t encoding)
 {
@@ -91,10 +108,45 @@ Decoder::Decoding Decoder::getDecoding(uint32_t encoding)
     return decoding; 
 }
 
+Instruction Decoder::decode(uint32_t encoding)
+{
+    Decoding decoding = getDecoding(encoding);
+    Type type = instrType[decoding.opcode];
+    auto imm = decoding.getImm(type);
+    
+    uint32_t instrKey = 0;
+    switch(decoding.opcode)
+    {
+        case RIALU:
+        case RALU:
+            instrKey = decoding.opcode | (decoding.funct7 << 7);
+            break;
+        
+        case PROC:
+            instrKey = decoding.getImm(type);
 
+        case LUI:
+        case AUIPC:
+        case JAL:
+        case JALR:
+            instrKey = 0;
+        default:
+            if(decoding.funct3 == SR)
+            {   
+                if(decoding.funct7 == 0)
+                    instrKey = decoding.funct3 << 1;
+                else
+                    instrKey = (decoding.funct3 << 1) + 1;
+            }
+            else
+                instrKey = decoding.funct3;
+    }
 
-
-
+    Executor executor = instructions[decoding.opcode][instrKey];
+    Instruction instr(  encoding, executor, imm, decoding.rs1,
+                        decoding.rs2, decoding.rd);
+    return instr;
+}
 
 
 

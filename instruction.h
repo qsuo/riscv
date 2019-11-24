@@ -4,24 +4,33 @@
 
 #include <stdint.h>
 
-typedef int(*executor)(Instruction& this, Instruction& next)
+class Riscv;
 
-class Instrusction()
+class Instruction
 {
 public:
-    Instruction(uint32_t encoding);
-    ~Incstruction();
-    executor execute;
+    
+    typedef void (Riscv::*Executor)(const Instruction& instr);
+
+    Instruction(uint32_t encoding, Executor executor, 
+                uint16_t imm, uint8_t rs1, uint8_t rs2, uint8_t rd):
+        encoding(encoding),
+        imm(imm),
+        rs1(rs1),
+        rs2(rs2),
+        rd(rd),
+        executor(executor)
+    {}
+    
+    uint32_t encoding;
+    uint16_t imm;
+    uint8_t rs1;
+    uint8_t rs2;
+    uint8_t rd;
+
     
 private:
-    int decode(uint32_t encoding);
-
-    uint32_t m_encoding;
-
-    uint16_t m_imm;
-    uint8_t m_rs1;
-    uint8_t m_rs2;
-    uint8_t m_rd;
-}
+    Executor executor; 
+};
 
 #endif 
