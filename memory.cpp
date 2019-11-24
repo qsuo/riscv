@@ -5,7 +5,7 @@
 #include <cassert> 
 #include <cstring>
 
-Memory::Memory(std::size_t size):
+Memory::Memory(uint32_t size):
     size_(size)
 {
     memory_ = new uint8_t[size_];
@@ -14,7 +14,6 @@ Memory::Memory(std::size_t size):
 
 Memory::~Memory()
 {
-    std::cout<<"Mem destructor...\n";
     delete[] memory_;
     memory_ = NULL;
 }
