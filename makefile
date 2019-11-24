@@ -10,11 +10,11 @@ memory: memory.o
 decoder: decoder.o
 	$(CC) $(CFLAGS) -o test/$@ test/$@.cpp $<
 
-simulator: simulator.o memory.o
+riscv: riscv.o memory.o hart.o
 	$(CC) $(CFLAGS) -o test/$@ test/$@.cpp $^
 
 
-test: memory simulator decoder
+test: memory riscv decoder 
 
 clean:
 	rm -rf *.o
