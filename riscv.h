@@ -18,7 +18,7 @@ public:
 
     #include "rv32i.inc"
 private:
-    
+
     Hart hart;
     Memory memory;
 

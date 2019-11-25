@@ -15,23 +15,23 @@ public:
     //~Decoder();
 
     typedef void (Riscv::*Executor)(const Instruction& instr);
-   
-    
+
+
     enum Type
     {
-        R = 1, 
+        R = 1,
         I,
         S,
         B,
         U,
-        J, 
+        J,
         NONE
     };
 
     enum DecodingType
     {
         RALU = 0b0110011,
-        RIALU = 0b0010011, 
+        RIALU = 0b0010011,
         PROC = 0b1110011,
         LUI = 0b0110111,
         AUIPC = 0b0010111,
@@ -39,7 +39,7 @@ public:
         JALR = 0b1100111,
         SR = 0b101
     };
-    
+
     std::unordered_map<uint32_t, Type> instrType = {
         {0b0110111, U},
         {0b0010111, U},
@@ -78,7 +78,7 @@ public:
         {0b0100000101, &Riscv::sra},
         {0b0000000110, &Riscv::or_},
         {0b0000000111, &Riscv::and_}};
-    
+
     instrMap Branch = {
         {0b000, &Riscv::beq},
         {0b001, &Riscv::bne},
@@ -131,18 +131,18 @@ public:
         {0b0110011, RAlu},
         {0b0001111, Fence},
         {0b1110011, Procedure}};
-    
+
     static const int BYTE_SIZE = 8;
-    
+
     struct Mask
     {
-        enum Field 
+        enum Field
         {
             OPCODE      = 0b00000000'00000000'00000000'01111111,
             RD          = 0b00000000'00000000'00001111'10000000,
             FUNCT3      = 0b00000000'00000000'01110000'00000000,
             RS1         = 0b00000000'00001111'10000000'00000000,
-            RS2         = 0b00000001'11110000'00000000'00000000, 
+            RS2         = 0b00000001'11110000'00000000'00000000,
             FUNCT7      = 0b11111110'00000000'00000000'00000000,
             I_IMM11_0   = 0b11111111'11110000'00000000'00000000,
             S_IMM11_5   = 0b11111110'00000000'00000000'00000000,

@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "decoder.h"
-         
+
 
 int Decoder::findFirstUp(uint32_t raw)
 {
@@ -11,11 +11,11 @@ int Decoder::findFirstUp(uint32_t raw)
     int nbit = sizeof(raw) * BYTE_SIZE;
     int pos = 0;
     for(pos = 0; pos < nbit && bit == 0; pos++)
-    {   
+    {
         int newMask = mask << pos;
         bit = (raw & newMask) >> pos;
     }
-    
+
     return --pos;
 }
 
@@ -105,7 +105,7 @@ Decoder::Decoding Decoder::getDecoding(uint32_t encoding)
         .J_imm19_12 = this->applyMask(encoding, Mask::J_IMM19_12)
     };
 
-    return decoding; 
+    return decoding;
 }
 
 Instruction Decoder::decode(uint32_t encoding)
@@ -113,7 +113,7 @@ Instruction Decoder::decode(uint32_t encoding)
     Decoding decoding = getDecoding(encoding);
     Type type = instrType[decoding.opcode];
     auto imm = decoding.getImm(type);
-    
+
     uint32_t instrKey = 0;
     switch(decoding.opcode)
     {
@@ -121,7 +121,7 @@ Instruction Decoder::decode(uint32_t encoding)
         case RALU:
             instrKey = decoding.opcode | (decoding.funct7 << 7);
             break;
-        
+
         case PROC:
             instrKey = decoding.getImm(type);
 
@@ -132,7 +132,7 @@ Instruction Decoder::decode(uint32_t encoding)
             instrKey = 0;
         default:
             if(decoding.funct3 == SR)
-            {   
+            {
                 if(decoding.funct7 == 0)
                     instrKey = decoding.funct3 << 1;
                 else

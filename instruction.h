@@ -9,10 +9,10 @@ class Riscv;
 class Instruction
 {
 public:
-    
+
     typedef void (Riscv::*Executor)(const Instruction& instr);
 
-    Instruction(uint32_t encoding, Executor executor, 
+    Instruction(uint32_t encoding, Executor executor,
                 uint16_t imm, uint8_t rs1, uint8_t rs2, uint8_t rd):
         encoding(encoding),
         imm(imm),
@@ -21,16 +21,16 @@ public:
         rd(rd),
         executor(executor)
     {}
-    
+
     uint32_t encoding;
     uint16_t imm;
     uint8_t rs1;
     uint8_t rs2;
     uint8_t rd;
 
-    
+
 private:
-    Executor executor; 
+    Executor executor;
 };
 
-#endif 
+#endif
