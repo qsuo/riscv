@@ -1,4 +1,7 @@
 #define DEF_INSTR(instr_name) void instr_name(const Instruction& instr) {}
+#define DECL_INSTR(instr_name) void instr_name(const Instruction& instr);
+
+DECL_INSTR(addi)
 
 DEF_INSTR(lui)
 DEF_INSTR(auipc)
@@ -18,7 +21,6 @@ DEF_INSTR(lhu)
 DEF_INSTR(sb)
 DEF_INSTR(sh)
 DEF_INSTR(sw)
-DEF_INSTR(addi)
 DEF_INSTR(slti)
 DEF_INSTR(sltiu)
 DEF_INSTR(xori)
