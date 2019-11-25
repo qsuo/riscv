@@ -1,4 +1,5 @@
-*.swp
-*.swo
+elf/
+tmp/
+*.sw*
 *.o
 *.exe
