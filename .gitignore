@@ -1,7 +1,4 @@
-*
-!.gitignore
-!test/*.cpp
-!*.inc
-!*.cpp
-!*.h
-!makefile
+*.swp
+*.swo
+*.o
+*.exe
