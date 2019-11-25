@@ -1,0 +1,7 @@
+
+Cross compiler: https://github.com/riscv/riscv-gnu-toolchain
+
+For assembling:
+    riscv32-unknown-linux-gnu-as *.asm
+
+
