@@ -28,17 +28,22 @@ public:
         NONE
     };
 
-    enum DecodingType
+    enum Opcode
     {
-        RALU = 0b0110011,
-        RIALU = 0b0010011,
-        PROC = 0b1110011,
-        LUI = 0b0110111,
-        AUIPC = 0b0010111,
-        JAL = 0b1101111,
-        JALR = 0b1100111,
-        SR = 0b101
+        OP_IMM =    0b0010011,
+        OP =        0b0110011,
+        LUI =       0b0110111,
+        AUIPC =     0b0010111,
+        JAL =       0b1101111,
+        JALR =      0b1100111,
+        BRANCH =    0b1100011,
+        LOAD =      0b0000011,
+        STORE =     0b0100011,
+        MISC_MEM =  0b0001111,
+        SYSTEM =    0b1110011
     };
+
+    enum Funct3 { SR = 0b101 };
 
     std::unordered_map<uint32_t, Type> instrType = {
         {0b0110111, U},

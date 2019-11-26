@@ -119,11 +119,11 @@ Instruction Decoder::decode(uint32_t encoding)
     uint32_t instrKey = 0;
     switch(decoding.opcode)
     {
-        case RALU:
+        case OP:
             instrKey = decoding.funct3 | (decoding.funct7 << 3);
             break;
 
-        case PROC:
+        case SYSTEM:
             instrKey = decoding.getImm(type);
             break;
 
@@ -134,7 +134,7 @@ Instruction Decoder::decode(uint32_t encoding)
             instrKey = 0;
             break;
 
-        case RIALU:
+        case OP_IMM:
             if(decoding.funct3 == SR)
             {
                 if(decoding.funct7 == 0)
