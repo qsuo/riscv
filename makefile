@@ -13,7 +13,10 @@ riscv: riscv.o memory.o hart.o
 decoder: decoder.o riscv.o memory.o hart.o
 	$(CC) $(CFLAGS) -o test/$@ test/$@.cpp $^
 
-test: memory riscv decoder 
+simulator: decoder.o riscv.o hart.o memory.o
+	$(CC) $(CFLAGS) -o test/$@ test/$@.cpp $^
+
+test: memory riscv decoder simulator
 
 clean:
 	rm -rf *.o
