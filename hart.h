@@ -14,6 +14,7 @@ public:
     void updatePc(uint32_t newPc=0); //TODO address_t
     reg_t getReg(int num);
     void setReg(int num, reg_t val);
+    uint32_t getPc() { return pc; }
 
 private:
     static const int XLEN = 32;
