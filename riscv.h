@@ -11,17 +11,16 @@ class Riscv
 public:
     Riscv(uint32_t memorySize);
 
-    std::size_t getMemorySize()
-    {
-        return memory.getSize();
-    }
+    size_t getMemorySize();
+    reg_t getReg(int num);
+    void setReg(int num, reg_t val);
 
+    // instructions executors
     #include "rv32i.inc"
 private:
 
     Hart hart;
     Memory memory;
-
 };
 
 #endif

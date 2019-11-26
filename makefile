@@ -10,7 +10,7 @@ memory: memory.o
 riscv: riscv.o memory.o hart.o
 	$(CC) $(CFLAGS) -o test/$@ test/$@.cpp $^
 
-decoder: decoder.o riscv.o memory.o
+decoder: decoder.o riscv.o memory.o hart.o
 	$(CC) $(CFLAGS) -o test/$@ test/$@.cpp $^
 
 test: memory riscv decoder
