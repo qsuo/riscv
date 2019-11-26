@@ -180,13 +180,13 @@ public:
         uint32_t J_imm11;
         uint32_t J_imm19_12;
 
-        uint32_t getIImm();
-        uint32_t getSImm();
-        uint32_t getBImm();
-        uint32_t getUImm();
-        uint32_t getJImm();
+        int32_t getIImm();
+        int32_t getSImm();
+        int32_t getBImm();
+        int32_t getUImm();
+        int32_t getJImm();
 
-        uint32_t getImm(Type type);
+        int32_t getImm(Type type);
     };
 
     uint32_t applyMask(uint32_t raw, uint32_t mask);

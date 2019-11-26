@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <cassert>
 
 #include "decoder.h"
 
@@ -24,45 +25,45 @@ uint32_t Decoder::applyMask(uint32_t raw, uint32_t mask)
     return (raw & mask) >> this->findFirstUp(mask);
 }
 
-uint32_t Decoder::Decoding::getIImm()
+int32_t Decoder::Decoding::getIImm()
 {
-    return I_imm11_0;
+    return (int32_t)I_imm11_0;
 }
 
-uint32_t Decoder::Decoding::getSImm()
+int32_t Decoder::Decoding::getSImm()
 {
     uint32_t imm4_0 = S_imm4_0;
     uint32_t imm11_5 = S_imm11_5 << 5;
-    uint32_t imm = imm4_0 | imm11_5;
+    int32_t imm = imm4_0 | imm11_5;
     return imm;
 }
 
-uint32_t Decoder::Decoding::getBImm()
+int32_t Decoder::Decoding::getBImm()
 {
     uint32_t imm12 = B_imm12 << 11;
     uint32_t imm10_5 = B_imm10_5 << 4;
     uint32_t imm4_1 = B_imm4_1;
     uint32_t imm11 = B_imm11 << 10;
-    uint32_t imm = imm4_1 | imm10_5 | imm11 | imm12;
+    int32_t imm = imm4_1 | imm10_5 | imm11 | imm12;
     return imm;
 }
 
-uint32_t Decoder::Decoding::getUImm()
+int32_t Decoder::Decoding::getUImm()
 {
-    return U_imm31_12;
+    return (int32_t)U_imm31_12;
 }
 
-uint32_t Decoder::Decoding::getJImm()
+int32_t Decoder::Decoding::getJImm()
 {
     uint32_t imm10_1 = J_imm10_1;
     uint32_t imm11 = J_imm11 << 10;
     uint32_t imm19_12 = J_imm19_12 << 11;
     uint32_t imm20 = J_imm20 << 19;
-    uint32_t imm = imm10_1 | imm11 | imm19_12 | imm20;
+    int32_t imm = imm10_1 | imm11 | imm19_12 | imm20;
     return imm;
 }
 
-uint32_t Decoder::Decoding::getImm(Type type)
+int32_t Decoder::Decoding::getImm(Type type)
 {
     switch(type)
     {
@@ -108,6 +109,7 @@ Decoder::Decoding Decoder::getDecoding(uint32_t encoding)
     return decoding;
 }
 
+
 Instruction Decoder::decode(uint32_t encoding)
 {
     Decoding decoding = getDecoding(encoding);
@@ -117,20 +119,22 @@ Instruction Decoder::decode(uint32_t encoding)
     uint32_t instrKey = 0;
     switch(decoding.opcode)
     {
-        case RIALU:
         case RALU:
-            instrKey = decoding.opcode | (decoding.funct7 << 7);
+            instrKey = decoding.funct3 | (decoding.funct7 << 3);
             break;
 
         case PROC:
             instrKey = decoding.getImm(type);
+            break;
 
         case LUI:
         case AUIPC:
         case JAL:
         case JALR:
             instrKey = 0;
-        default:
+            break;
+
+        case RIALU:
             if(decoding.funct3 == SR)
             {
                 if(decoding.funct7 == 0)
@@ -140,9 +144,15 @@ Instruction Decoder::decode(uint32_t encoding)
             }
             else
                 instrKey = decoding.funct3;
-    }
+            break;
 
-    Executor executor = instructions[decoding.opcode][instrKey];
+        default:
+            instrKey = decoding.funct3;
+            break;
+    }
+        
+    auto executor = instructions.at(decoding.opcode).at(instrKey);
+    
     Instruction instr(  encoding, executor, imm, decoding.rs1,
                         decoding.rs2, decoding.rd);
     return instr;
