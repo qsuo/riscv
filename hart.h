@@ -6,7 +6,7 @@
 
 #include "memory.h"
 
-typedef uint32_t reg_t;
+typedef int32_t reg_t;
 
 class Hart
 {
