@@ -155,3 +155,79 @@ void Riscv::sra(const Instruction& instr)
     setReg(instr.rd, getReg(instr.rs1) >> (getReg(instr.rs2) & 0x1F));
     hart.updatePc();
 }
+
+/*  Control transfer instructions  */
+
+void Riscv::jal(const Instruction& instr)
+{
+    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
+    setReg(instr.rd, hart.getPc() + 4);
+    hart.updatePc(new_pc);
+}
+
+void Riscv::jalr(const Instruction& instr)
+{
+    uint32_t new_pc = (getReg(instr.rs1) + instr.imm) & ~0x1u;
+    setReg(instr.rd, hart.getPc() + 4);
+    hart.updatePc(new_pc);
+}
+
+void Riscv::beq(const Instruction& instr)
+{
+    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
+
+    if (instr.rs1 == instr.rs2)
+        hart.updatePc(new_pc);
+    else
+        hart.updatePc();
+}
+
+void Riscv::bne(const Instruction& instr)
+{
+    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
+
+    if (instr.rs1 != instr.rs2)
+        hart.updatePc(new_pc);
+    else
+        hart.updatePc();
+}
+
+void Riscv::blt(const Instruction& instr)
+{
+    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
+
+    if (instr.rs1 < instr.rs2)
+        hart.updatePc(new_pc);
+    else
+        hart.updatePc();
+}
+
+void Riscv::bltu(const Instruction& instr)
+{
+    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
+
+    if ((uint32_t)instr.rs1 < (uint32_t)instr.rs2)
+        hart.updatePc(new_pc);
+    else
+        hart.updatePc();
+}
+
+void Riscv::bge(const Instruction& instr)
+{
+    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
+
+    if (instr.rs1 >= instr.rs2)
+        hart.updatePc(new_pc);
+    else
+        hart.updatePc();
+}
+
+void Riscv::bgeu(const Instruction& instr)
+{
+    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
+
+    if ((uint32_t)instr.rs1 >= (uint32_t)instr.rs2)
+        hart.updatePc(new_pc);
+    else
+        hart.updatePc();
+}
