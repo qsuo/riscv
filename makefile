@@ -1,4 +1,4 @@
-CFLAGS:= -Wall
+CFLAGS:= -Wall -std=c++17
 CC:=g++
 
 %.o: %.cpp
@@ -10,10 +10,10 @@ memory: memory.o
 riscv: riscv.o memory.o hart.o
 	$(CC) $(CFLAGS) -o test/$@ test/$@.cpp $^
 
-decoder: decoder.o riscv.o memory.o
+decoder: decoder.o riscv.o memory.o hart.o
 	$(CC) $(CFLAGS) -o test/$@ test/$@.cpp $^
 
-test: memory riscv decoder
+test: memory riscv decoder 
 
 clean:
 	rm -rf *.o
