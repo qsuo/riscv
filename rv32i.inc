@@ -1,6 +1,7 @@
 #define DEF_INSTR(instr_name) void instr_name(const Instruction& instr) {}
 #define DECL_INSTR(instr_name) void instr_name(const Instruction& instr);
 
+/*  Integer register-immediate instructions  */
 DECL_INSTR(addi)
 DECL_INSTR(slti)
 DECL_INSTR(sltiu)
@@ -12,6 +13,18 @@ DECL_INSTR(slli)
 DECL_INSTR(srli)
 DECL_INSTR(srai)
 DECL_INSTR(auipc)
+
+/*  Integer register-register operations  */
+DECL_INSTR(add_)
+DECL_INSTR(sub)
+DECL_INSTR(slt)
+DECL_INSTR(sltu)
+DECL_INSTR(and_)
+DECL_INSTR(or_)
+DECL_INSTR(xor_)
+DECL_INSTR(sll)
+DECL_INSTR(srl)
+DECL_INSTR(sra)
 
 DEF_INSTR(jal)
 DEF_INSTR(jalr)
@@ -29,16 +42,6 @@ DEF_INSTR(lhu)
 DEF_INSTR(sb)
 DEF_INSTR(sh)
 DEF_INSTR(sw)
-DEF_INSTR(add_)
-DEF_INSTR(sub)
-DEF_INSTR(sll)
-DEF_INSTR(slt)
-DEF_INSTR(sltu)
-DEF_INSTR(xor_)
-DEF_INSTR(srl)
-DEF_INSTR(sra)
-DEF_INSTR(or_)
-DEF_INSTR(and_)
 DEF_INSTR(fence)
 DEF_INSTR(fence_i)
 DEF_INSTR(ecall)
