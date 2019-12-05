@@ -231,3 +231,72 @@ void Riscv::bgeu(const Instruction& instr)
     else
         hart.updatePc();
 }
+
+void Riscv::lb(const Instruction& instr)
+{
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    int8_t b = 0;
+    memory.read(addr, &b, sizeof(b));
+    setReg(instr.rd, (int32_t)b);
+    hart.updatePc();
+}
+
+void Riscv::lh(const Instruction& instr)
+{
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    int16_t h = 0;
+    memory.read(addr, &h, sizeof(h));
+    setReg(instr.rd, (int32_t)h);
+    hart.updatePc();
+}
+
+void Riscv::lw(const Instruction& instr)
+{
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    int32_t w = 0;
+    memory.read(addr, &w, sizeof(w));
+    setReg(instr.rd, w);
+    hart.updatePc();
+}
+
+void Riscv::lbu(const Instruction& instr)
+{
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    uint8_t ub = 0;
+    memory.read(addr, &ub, sizeof(ub));
+    setReg(instr.rd, (uint32_t)ub);
+    hart.updatePc();
+}
+
+void Riscv::lhu(const Instruction& instr)
+{
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    uint16_t uh = 0;
+    memory.read(addr, &uh, sizeof(uh));
+    setReg(instr.rd, (int32_t)uh);
+    hart.updatePc();
+}
+
+void Riscv::sb(const Instruction& instr)
+{
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    int8_t b = getReg(instr.rs2) & 0xFF;
+    memory.write(addr, &b, sizeof(b));
+    hart.updatePc();
+}
+
+void Riscv::sh(const Instruction& instr)
+{
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    int16_t h = getReg(instr.rs2) & 0xFFFF;
+    memory.write(addr, &h, sizeof(h));
+    hart.updatePc();
+}
+
+void Riscv::sw(const Instruction& instr)
+{
+    address_t addr = getReg(instr.rs1) + instr.imm;
+    int32_t w = getReg(instr.rs2);
+    memory.write(addr, &w, sizeof(w));
+    hart.updatePc();
+}
