@@ -46,21 +46,22 @@ public:
     enum Funct3 { SR = 0b101 };
 
     std::unordered_map<uint32_t, Type> instrType = {
-        {0b0110111, U},
-        {0b0010111, U},
-        {0b1101111, J},
-        {0b1100111, I},
-        {0b1100011, B},
-        {0b0000011, I},
-        {0b0100011, S},
-        {0b0010011, I},
-        {0b0110011, R},
-        {0b1110011, I},
-        {0b0001111, NONE}};
+        {LUI,       U},
+        {AUIPC,     U},
+        {JAL,       J},
+        {JALR,      I},
+        {BRANCH,    B},
+        {LOAD,      I},
+        {STORE,     S},
+        {OP_IMM,    I},
+        {OP,        R},
+        {SYSTEM,    I},
+        {MISC_MEM,  NONE}};
 
 
     typedef std::unordered_map<uint32_t, Executor> instrMap;
-    instrMap IAlu = {
+
+    instrMap OpImm = {
         {0b000, &Riscv::addi},
         {0b010, &Riscv::slti},
         {0b011, &Riscv::sltiu},
@@ -69,10 +70,9 @@ public:
         {0b111, &Riscv::andi},
         {0b001, &Riscv::slli},
         {0b1010, &Riscv::srli},
-        {0b1011, &Riscv::srai},
-    };
+        {0b1011, &Riscv::srai}};
 
-    instrMap RAlu = {
+    instrMap Op = {
         {0b0000000000, &Riscv::add_},
         {0b0100000000, &Riscv::sub},
         {0b0000000001, &Riscv::sll},
@@ -104,38 +104,44 @@ public:
         {0b001, &Riscv::sh},
         {0b010, &Riscv::sw}};
 
-    instrMap Jump = {
+    instrMap Jal = {
         {0b0, &Riscv::jal}};
 
-    instrMap RJump = {
+    instrMap Jalr = {
         {0b0, &Riscv::jalr}};
 
-    instrMap LoadUpper = {
+    instrMap Lui = {
         {0b0, &Riscv::lui}};
 
-    instrMap AddPc = {
+    instrMap Auipc = {
         {0b0, &Riscv::auipc}};
 
-    instrMap Fence = {
+    instrMap MiscMem = {
         {0b000, &Riscv::fence},
         {0b001, &Riscv::fence_i}};
 
-    instrMap Procedure = {
-        {0b0, &Riscv::ecall},
-        {0b1, &Riscv::ebreak}};
+    instrMap System = {
+        {0b0000, &Riscv::ecall},
+        {0b1000, &Riscv::ebreak},
+        {0b0001, &Riscv::csrrw},
+        {0b0010, &Riscv::csrrs},
+        {0b0011, &Riscv::csrrc},
+        {0b0101, &Riscv::csrrwi},
+        {0b0110, &Riscv::csrrsi},
+        {0b0111, &Riscv::csrrci}};
 
     std::unordered_map<uint32_t, instrMap> instructions = {
-        {0b0110111, LoadUpper},
-        {0b0010111, AddPc},
-        {0b1101111, Jump},
-        {0b1100111, RJump},
-        {0b1100011, Branch},
-        {0b0000011, Load},
-        {0b0100011, Store},
-        {0b0010011, IAlu},
-        {0b0110011, RAlu},
-        {0b0001111, Fence},
-        {0b1110011, Procedure}};
+        {LUI,       Lui},
+        {AUIPC,     Auipc},
+        {JAL,       Jal},
+        {JALR,      Jalr},
+        {BRANCH,    Branch},
+        {LOAD,      Load},
+        {STORE,     Store},
+        {OP_IMM,    OpImm},
+        {OP,        Op},
+        {MISC_MEM,  MiscMem},
+        {SYSTEM,    System}};
 
     static const int BYTE_SIZE = 8;
 
@@ -147,9 +153,12 @@ public:
             RD          = 0b00000000'00000000'00001111'10000000,
             FUNCT3      = 0b00000000'00000000'01110000'00000000,
             RS1         = 0b00000000'00001111'10000000'00000000,
+            ZIMM        = 0b00000000'00001111'10000000'00000000,
             RS2         = 0b00000001'11110000'00000000'00000000,
+            SHAMT       = 0b00000001'11110000'00000000'00000000,
             FUNCT7      = 0b11111110'00000000'00000000'00000000,
             I_IMM11_0   = 0b11111111'11110000'00000000'00000000,
+            CSR         = 0b11111111'11110000'00000000'00000000, 
             S_IMM11_5   = 0b11111110'00000000'00000000'00000000,
             S_IMM4_0    = 0b00000000'00000000'00001111'10000000,
             B_IMM12     = 0b10000000'00000000'00000000'00000000,
@@ -170,9 +179,12 @@ public:
         uint32_t rd;
         uint32_t funct3;
         uint32_t rs1;
+        uint32_t zimm;
         uint32_t rs2;
+        uint32_t shamt;
         uint32_t funct7;
         uint32_t I_imm11_0;
+        uint32_t csr;
         uint32_t S_imm11_5;
         uint32_t S_imm4_0;
         uint32_t B_imm12;

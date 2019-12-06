@@ -86,24 +86,27 @@ int32_t Decoder::Decoding::getImm(Type type)
 Decoder::Decoding Decoder::getDecoding(uint32_t encoding)
 {
     Decoding decoding = {
-        .opcode     = this->applyMask(encoding, Mask::OPCODE),
-        .rd         = this->applyMask(encoding, Mask::RD),
-        .funct3     = this->applyMask(encoding, Mask::FUNCT3),
-        .rs1        = this->applyMask(encoding, Mask::RS1),
-        .rs2        = this->applyMask(encoding, Mask::RS2),
-        .funct7     = this->applyMask(encoding, Mask::FUNCT7),
-        .I_imm11_0  = this->applyMask(encoding, Mask::I_IMM11_0),
-        .S_imm11_5  = this->applyMask(encoding, Mask::S_IMM11_5),
-        .S_imm4_0   = this->applyMask(encoding, Mask::S_IMM4_0),
-        .B_imm12    = this->applyMask(encoding, Mask::B_IMM12),
-        .B_imm10_5  = this->applyMask(encoding, Mask::B_IMM10_5),
-        .B_imm4_1   = this->applyMask(encoding, Mask::B_IMM4_1),
-        .B_imm11    = this->applyMask(encoding, Mask::B_IMM11),
-        .U_imm31_12 = this->applyMask(encoding, Mask::U_IMM31_12),
-        .J_imm20    = this->applyMask(encoding, Mask::J_IMM20),
-        .J_imm10_1  = this->applyMask(encoding, Mask::J_IMM10_1),
-        .J_imm11    = this->applyMask(encoding, Mask::J_IMM11),
-        .J_imm19_12 = this->applyMask(encoding, Mask::J_IMM19_12)
+        .opcode     = applyMask(encoding, Mask::OPCODE),
+        .rd         = applyMask(encoding, Mask::RD),
+        .funct3     = applyMask(encoding, Mask::FUNCT3),
+        .rs1        = applyMask(encoding, Mask::RS1),
+        .zimm       = applyMask(encoding, Mask::ZIMM),
+        .rs2        = applyMask(encoding, Mask::RS2),
+        .shamt      = applyMask(encoding, Mask::SHAMT),
+        .funct7     = applyMask(encoding, Mask::FUNCT7),
+        .I_imm11_0  = applyMask(encoding, Mask::I_IMM11_0),
+        .csr        = applyMask(encoding, Mask::CSR),
+        .S_imm11_5  = applyMask(encoding, Mask::S_IMM11_5),
+        .S_imm4_0   = applyMask(encoding, Mask::S_IMM4_0),
+        .B_imm12    = applyMask(encoding, Mask::B_IMM12),
+        .B_imm10_5  = applyMask(encoding, Mask::B_IMM10_5),
+        .B_imm4_1   = applyMask(encoding, Mask::B_IMM4_1),
+        .B_imm11    = applyMask(encoding, Mask::B_IMM11),
+        .U_imm31_12 = applyMask(encoding, Mask::U_IMM31_12),
+        .J_imm20    = applyMask(encoding, Mask::J_IMM20),
+        .J_imm10_1  = applyMask(encoding, Mask::J_IMM10_1),
+        .J_imm11    = applyMask(encoding, Mask::J_IMM11),
+        .J_imm19_12 = applyMask(encoding, Mask::J_IMM19_12)
     };
 
     return decoding;
@@ -124,7 +127,10 @@ Instruction Decoder::decode(uint32_t encoding)
             break;
 
         case SYSTEM:
-            instrKey = decoding.getImm(type);
+            if(decoding.funct3 == 0b000)
+                instrKey = decoding.funct3 | (decoding.getImm(type) << 3);
+            else
+                instrKey = decoding.funct3;
             break;
 
         case LUI:
