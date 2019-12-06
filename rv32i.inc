@@ -58,4 +58,4 @@ DEF_INSTR(csrrsi)
 DEF_INSTR(csrrci)
 
 #undef DEF_INSTR
-
+#undef DECL_INSTR

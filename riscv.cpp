@@ -27,134 +27,72 @@ void Riscv::setReg(int num, reg_t val)
 
 /*  Integer register-immediate instructions  */
 
-void Riscv::addi(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) + instr.imm);
-    hart.updatePc();
+#define INT_REG_IMM(name, op)                          \
+void Riscv::name(const Instruction& instr)             \
+{                                                      \
+    setReg(instr.rd, getReg(instr.rs1) op instr.imm);  \
+    hart.updatePc();                                   \
 }
 
-void Riscv::slti(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) < instr.imm);
-    hart.updatePc();
+INT_REG_IMM(addi, +)
+INT_REG_IMM(slti, <)
+INT_REG_IMM(andi, &)
+INT_REG_IMM(ori, |)
+INT_REG_IMM(xori, ^)
+
+#undef INT_REG_IMM
+
+#define INT_REG_IMM(name, val)              \
+void Riscv::name(const Instruction& instr)  \
+{                                           \
+    setReg(instr.rd, (val));                \
+    hart.updatePc();                        \
 }
 
-void Riscv::sltiu(const Instruction& instr)
-{
-    setReg(instr.rd, (uint32_t)(getReg(instr.rs1)) < (uint32_t)(instr.imm));
-    hart.updatePc();
-}
+INT_REG_IMM(sltiu, (uint32_t)(getReg(instr.rs1)) < (uint32_t)(instr.imm))
 
-void Riscv::andi(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) & instr.imm);
-    hart.updatePc();
-}
+// shift instructions have shamt in rs2 field
+INT_REG_IMM(slli, getReg(instr.rs1) << instr.rs2)
+INT_REG_IMM(srli, (uint32_t)getReg(instr.rs1) >> instr.rs2)
+INT_REG_IMM(srai, getReg(instr.rs1) >> instr.rs2)
 
-void Riscv::ori(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) | instr.imm);
-    hart.updatePc();
-}
+INT_REG_IMM(lui, (instr.imm << 12) & ~0xFFF)
+INT_REG_IMM(auipc, ((instr.imm << 12) & ~0xFFF) + hart.getPc())
 
-void Riscv::xori(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) ^ instr.imm);
-    hart.updatePc();
-}
-
-void Riscv::slli(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) << (instr.imm & 0x1F));
-    hart.updatePc();
-}
-
-void Riscv::srli(const Instruction& instr)
-{
-    setReg(instr.rd, (uint32_t)getReg(instr.rs1) >> (instr.imm & 0x1F));
-    hart.updatePc();
-}
-
-void Riscv::srai(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) >> (instr.imm & 0x1F));
-    hart.updatePc();
-}
-
-void Riscv::lui(const Instruction& instr)
-{
-    setReg(instr.rd, (instr.imm << 12) & ~0xFFF);
-    hart.updatePc();
-}
-
-void Riscv::auipc(const Instruction& instr)
-{
-    reg_t res = ((instr.imm << 12) & ~0xFFF) + hart.getPc();
-    setReg(instr.rd, res);
-    hart.updatePc();
-}
+#undef INT_REG_IMM
 
 /*  Integer register-register instructions  */
 
-void Riscv::add_(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) + getReg(instr.rs2));
-    hart.updatePc();
+#define INT_REG_REG(name, op)                                  \
+void Riscv::name(const Instruction& instr)                     \
+{                                                              \
+    setReg(instr.rd, getReg(instr.rs1) op getReg(instr.rs2));  \
+    hart.updatePc();                                           \
 }
 
-void Riscv::sub(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) - getReg(instr.rs2));
-    hart.updatePc();
+INT_REG_REG(add_, +)
+INT_REG_REG(sub, -)
+INT_REG_REG(slt, <)
+INT_REG_REG(and_, &)
+INT_REG_REG(or_, |)
+INT_REG_REG(xor_, ^)
+
+#undef INT_REG_REG
+
+#define INT_REG_REG(name, val)              \
+void Riscv::name(const Instruction& instr)  \
+{                                           \
+    setReg(instr.rd, (val));                \
+    hart.updatePc();                        \
 }
 
-void Riscv::slt(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) < getReg(instr.rs2));
-    hart.updatePc();
-}
+INT_REG_REG(sltu, (uint32_t)getReg(instr.rs1) < (uint32_t)getReg(instr.rs2))
 
-void Riscv::sltu(const Instruction& instr)
-{
-    setReg(instr.rd, (uint32_t)getReg(instr.rs1) < (uint32_t)getReg(instr.rs2));
-    hart.updatePc();
-}
+INT_REG_REG(sll, getReg(instr.rs1) << (getReg(instr.rs2) & 0x1F))
+INT_REG_REG(srl, (uint32_t)getReg(instr.rs1) >> (getReg(instr.rs2) & 0x1F))
+INT_REG_REG(sra, getReg(instr.rs1) >> (getReg(instr.rs2) & 0x1F))
 
-void Riscv::and_(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) & getReg(instr.rs2));
-    hart.updatePc();
-}
-
-void Riscv::or_(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) | getReg(instr.rs2));
-    hart.updatePc();
-}
-
-void Riscv::xor_(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) ^ getReg(instr.rs2));
-    hart.updatePc();
-}
-
-void Riscv::sll(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) << (getReg(instr.rs2) & 0x1F));
-    hart.updatePc();
-}
-
-void Riscv::srl(const Instruction& instr)
-{
-    setReg(instr.rd, (uint32_t)getReg(instr.rs1) >> (getReg(instr.rs2) & 0x1F));
-    hart.updatePc();
-}
-
-void Riscv::sra(const Instruction& instr)
-{
-    setReg(instr.rd, getReg(instr.rs1) >> (getReg(instr.rs2) & 0x1F));
-    hart.updatePc();
-}
+#undef INT_REG_REG
 
 /*  Control transfer instructions  */
 
@@ -172,65 +110,41 @@ void Riscv::jalr(const Instruction& instr)
     hart.updatePc(new_pc);
 }
 
-void Riscv::beq(const Instruction& instr)
-{
-    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
-
-    if (instr.rs1 == instr.rs2)
-        hart.updatePc(new_pc);
-    else
-        hart.updatePc();
+#define COND_BRANCH(name, condition)                    \
+void Riscv::name(const Instruction& instr)              \
+{                                                       \
+    uint32_t new_pc = hart.getPc() + (instr.imm << 1);  \
+                                                        \
+    if (instr.rs1 condition instr.rs2)                  \
+        hart.updatePc(new_pc);                          \
+    else                                                \
+        hart.updatePc();                                \
 }
 
-void Riscv::bne(const Instruction& instr)
-{
-    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
+COND_BRANCH(beq, ==)
+COND_BRANCH(bne, !=)
+COND_BRANCH(blt, <)
+COND_BRANCH(bge, >=)
 
-    if (instr.rs1 != instr.rs2)
-        hart.updatePc(new_pc);
-    else
-        hart.updatePc();
+#undef COND_BRANCH
+
+#define UNSIGN_COND_BRANCH(name, condition)                 \
+void Riscv::name(const Instruction& instr)                  \
+{                                                           \
+    uint32_t new_pc = hart.getPc() + (instr.imm << 1);      \
+                                                            \
+    if ((uint32_t)instr.rs1 condition (uint32_t)instr.rs2)  \
+        hart.updatePc(new_pc);                              \
+    else                                                    \
+        hart.updatePc();                                    \
 }
 
-void Riscv::blt(const Instruction& instr)
-{
-    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
+UNSIGN_COND_BRANCH(bltu, <)
+UNSIGN_COND_BRANCH(bgeu, >=)
 
-    if (instr.rs1 < instr.rs2)
-        hart.updatePc(new_pc);
-    else
-        hart.updatePc();
-}
+#undef UNSIGN_COND_BRANCH
 
-void Riscv::bltu(const Instruction& instr)
-{
-    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
-
-    if ((uint32_t)instr.rs1 < (uint32_t)instr.rs2)
-        hart.updatePc(new_pc);
-    else
-        hart.updatePc();
-}
-
-void Riscv::bge(const Instruction& instr)
-{
-    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
-
-    if (instr.rs1 >= instr.rs2)
-        hart.updatePc(new_pc);
-    else
-        hart.updatePc();
-}
-
-void Riscv::bgeu(const Instruction& instr)
-{
-    uint32_t new_pc = hart.getPc() + (instr.imm << 1);
-
-    if ((uint32_t)instr.rs1 >= (uint32_t)instr.rs2)
-        hart.updatePc(new_pc);
-    else
-        hart.updatePc();
-}
+/*  Load and Store instructions  */
 
 void Riscv::lb(const Instruction& instr)
 {
