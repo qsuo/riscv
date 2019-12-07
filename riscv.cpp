@@ -1,6 +1,7 @@
 
 #include <iostream>
 
+#include <cassert>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -15,20 +16,30 @@ size_t Riscv::getMemorySize()
     return memory.getSize();
 }
 
-reg_t Riscv::getReg(int num)
+reg_t Riscv::getReg(uint8_t num)
 {
     reg_t val = hart.getReg(num);
     logRegRead(num, val);
     return val;
 }
 
-void Riscv::setReg(int num, reg_t val)
+void Riscv::setReg(uint8_t num, reg_t val)
 {
     hart.setReg(num, val);
     logRegWrite(num, val);
 }
 
-/*  Integer register-immediate instructions  */
+void Riscv::memRead(address_t addr, void* dst, size_t nbyte)
+{
+    memory.read(addr, dst, nbyte);
+    logMemRead(addr, dst, nbyte);
+}
+
+void Riscv::memWrite(address_t addr, void* src, size_t nbyte)
+{
+    memory.write(addr, src, nbyte);
+    logMemWrite(addr, src, nbyte);
+}
 
 #define INT_REG_IMM(name, op)                             \
 void Riscv::name(const Instruction& instr)                \
@@ -179,7 +190,7 @@ void Riscv::lb(const Instruction& instr)
     logRegImm("lb", instr.rd, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int8_t b = 0;
-    memory.read(addr, &b, sizeof(b));
+    memRead(addr, &b, sizeof(b));
     setReg(instr.rd, (int32_t)b);
     hart.updatePc();
 }
@@ -189,7 +200,7 @@ void Riscv::lh(const Instruction& instr)
     logRegImm("lh", instr.rd, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int16_t h = 0;
-    memory.read(addr, &h, sizeof(h));
+    memRead(addr, &h, sizeof(h));
     setReg(instr.rd, (int32_t)h);
     hart.updatePc();
 }
@@ -199,7 +210,7 @@ void Riscv::lw(const Instruction& instr)
     logRegImm("lw", instr.rd, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int32_t w = 0;
-    memory.read(addr, &w, sizeof(w));
+    memRead(addr, &w, sizeof(w));
     setReg(instr.rd, w);
     hart.updatePc();
 }
@@ -209,7 +220,7 @@ void Riscv::lbu(const Instruction& instr)
     logRegImm("lbu", instr.rd, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     uint8_t ub = 0;
-    memory.read(addr, &ub, sizeof(ub));
+    memRead(addr, &ub, sizeof(ub));
     setReg(instr.rd, (uint32_t)ub);
     hart.updatePc();
 }
@@ -219,7 +230,7 @@ void Riscv::lhu(const Instruction& instr)
     logRegImm("lhu", instr.rd, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     uint16_t uh = 0;
-    memory.read(addr, &uh, sizeof(uh));
+    memRead(addr, &uh, sizeof(uh));
     setReg(instr.rd, (int32_t)uh);
     hart.updatePc();
 }
@@ -229,7 +240,7 @@ void Riscv::sb(const Instruction& instr)
     logRegImm("sb", instr.rs1, instr.rs2, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int8_t b = getReg(instr.rs2) & 0xFF;
-    memory.write(addr, &b, sizeof(b));
+    memWrite(addr, &b, sizeof(b));
     hart.updatePc();
 }
 
@@ -238,7 +249,7 @@ void Riscv::sh(const Instruction& instr)
     logRegImm("sh", instr.rs1, instr.rs2, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int16_t h = getReg(instr.rs2) & 0xFFFF;
-    memory.write(addr, &h, sizeof(h));
+    memWrite(addr, &h, sizeof(h));
     hart.updatePc();
 }
 
@@ -247,7 +258,7 @@ void Riscv::sw(const Instruction& instr)
     logRegImm("sw", instr.rs1, instr.rs2, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int32_t w = getReg(instr.rs2);
-    memory.write(addr, &w, sizeof(w));
+    memWrite(addr, &w, sizeof(w));
     hart.updatePc();
 }
 
@@ -255,12 +266,52 @@ void Riscv::sw(const Instruction& instr)
 
 void Riscv::logRegRead(uint8_t num, reg_t val)
 {
-    log << "RR: " << regToStr(num) << " " << immToStr(val) << endl;
+    log << "RR " << regToStr(num) << " : " << immToStr(val) << endl;
 }
 
 void Riscv::logRegWrite(uint8_t num, reg_t val)
 {
-    log << "RW: " << regToStr(num) << " " << immToStr(val) << endl;
+    log << "RW " << regToStr(num) << " : " << immToStr(val) << endl;
+}
+
+void Riscv::logMemRead(address_t addr, void* dst, size_t nbyte)
+{
+    log << "MR";
+    switch (nbyte)
+    {
+        case sizeof(uint8_t):
+            log << "B " << addrToStr(addr) << " : " << immToStr(*(uint8_t*)dst);
+            break;
+        case sizeof(uint16_t):
+            log << "H " << addrToStr(addr) << " : " << immToStr(*(uint16_t*)dst);
+            break;
+        case sizeof(uint32_t):
+            log << "W " << addrToStr(addr) << " : " << immToStr(*(uint32_t*)dst);
+            break;
+        default:
+            assert(0 && "Invalid memory read size");
+    }
+    log << endl;
+}
+
+void Riscv::logMemWrite(address_t addr, void* src, size_t nbyte)
+{
+    log << "MW";
+    switch (nbyte)
+    {
+        case sizeof(uint8_t):
+            log << "B " << addrToStr(addr) << " : " << immToStr(*(uint8_t*)src);
+            break;
+        case sizeof(uint16_t):
+            log << "H " << addrToStr(addr) << " : " << immToStr(*(uint16_t*)src);
+            break;
+        case sizeof(uint32_t):
+            log << "W " << addrToStr(addr) << " : " << immToStr(*(uint32_t*)src);
+            break;
+        default:
+            assert(0 && "Invalid memory read size");
+    }
+    log << endl;
 }
 
 void Riscv::logRegImm(string name, uint8_t r1, uint8_t r2, int32_t imm)

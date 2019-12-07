@@ -12,10 +12,10 @@ class Memory
 public:
     Memory(uint32_t size);
     ~Memory();
-    void read(address_t address, void* dst, std::size_t nbyte);
-    void write(address_t address, void* src, std::size_t nbyte);
+    void read(address_t address, void* dst, size_t nbyte);
+    void write(address_t address, void* src, size_t nbyte);
 
-    std::size_t getSize()
+    size_t getSize()
     {
         return size_;
     }
@@ -23,7 +23,7 @@ public:
 
 private:
     uint32_t size_;
-    uint8_t* memory_; 
+    uint8_t* memory_;
 };
 
 #endif
