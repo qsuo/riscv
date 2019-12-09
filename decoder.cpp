@@ -156,12 +156,20 @@ Instruction Decoder::decode(uint32_t encoding)
             instrKey = decoding.funct3;
             break;
     }
-        
-    auto executor = instructions.at(decoding.opcode).at(instrKey);
-    
-    Instruction instr(  encoding, executor, imm, decoding.rs1,
+    try
+    {
+        auto executor = instructions.at(decoding.opcode).at(instrKey);
+         
+        Instruction instr(  encoding, executor, imm, decoding.rs1,
                         decoding.rs2, decoding.rd);
-    return instr;
+        return instr;
+    }
+    catch(...)
+    {
+        std::cerr << "Unknown instruction " << encoding << "\n";
+        exit(1);
+    }
+
 }
 
 

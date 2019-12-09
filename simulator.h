@@ -12,6 +12,8 @@ public:
     Simulator(size_t memorySize):riscv(memorySize)
     {}
 
+    void load(const char* name);
+
     uint32_t fetch(address_t address);
     Instruction decode(uint32_t encoding);
     void execute(const Instruction& instr);

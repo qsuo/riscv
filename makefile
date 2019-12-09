@@ -1,4 +1,4 @@
-CFLAGS:= -Wall -std=c++17
+CFLAGS:= -Wall -std=c++17 
 CC:=g++
 
 all: main
@@ -21,7 +21,7 @@ simulator: decoder.o riscv.o hart.o memory.o log_service.o
 test: memory riscv decoder simulator
 
 main: riscv.o memory.o decoder.o simulator.o main.o log_service.o hart.o
-	$(CC) $(CFLAGS) -o main $^
+	$(CC) $(CFLAGS) -o main $^ -lelf
 
 clean:
 	rm -rf *.o *.exe
