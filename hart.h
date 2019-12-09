@@ -16,7 +16,7 @@ public:
     void setReg(int num, reg_t val);
     uint32_t getPc() { return pc; }
 
-private:
+//private:
     static const int XLEN = 32;
     uint32_t pc;
     std::array<reg_t, XLEN> regs;

@@ -15,7 +15,9 @@ public:
     uint32_t fetch(address_t address);
     Instruction decode(uint32_t encoding);
     void execute(const Instruction& instr);
-private:
+
+    void run();
+//private:
     Riscv riscv;
     Decoder decoder;
 };

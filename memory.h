@@ -21,7 +21,7 @@ public:
     }
     //int dump(void* start=)
 
-private:
+//private:
     uint32_t size_;
     uint8_t* memory_;
 };

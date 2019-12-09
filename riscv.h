@@ -22,7 +22,7 @@ public:
     // instructions executors
     #include "rv32i.inc"
 
-private:
+//private:
     reg_t getReg(uint8_t num);
     void setReg(uint8_t num, reg_t val);
     void memRead(address_t addr, void* dst, size_t nbyte);

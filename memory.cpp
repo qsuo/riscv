@@ -9,7 +9,7 @@ Memory::Memory(uint32_t size):
     size_(size)
 {
     memory_ = new uint8_t[size_];
-    assert(memory_ != NULL);
+//    assert(memory_ != NULL);
 }
 
 Memory::~Memory()
@@ -20,6 +20,7 @@ Memory::~Memory()
 
 void Memory::read(address_t address, void* dst, std::size_t nbyte)
 {
+//    std::cerr << address << " " << size_  << " " << nbyte << "\n";
     assert((address < size_ + nbyte) && "Memory read out of bounds");
     std::memcpy(dst, &memory_[address], nbyte);
 }
