@@ -237,7 +237,7 @@ void Riscv::lhu(const Instruction& instr)
 
 void Riscv::sb(const Instruction& instr)
 {
-    logRegImm("sb", instr.rs1, instr.rs2, instr.imm);
+    logRegImm("sb", instr.rs2, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int8_t b = getReg(instr.rs2) & 0xFF;
     memWrite(addr, &b, sizeof(b));
@@ -246,7 +246,7 @@ void Riscv::sb(const Instruction& instr)
 
 void Riscv::sh(const Instruction& instr)
 {
-    logRegImm("sh", instr.rs1, instr.rs2, instr.imm);
+    logRegImm("sh", instr.rs2, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int16_t h = getReg(instr.rs2) & 0xFFFF;
     memWrite(addr, &h, sizeof(h));
@@ -255,7 +255,7 @@ void Riscv::sh(const Instruction& instr)
 
 void Riscv::sw(const Instruction& instr)
 {
-    logRegImm("sw", instr.rs1, instr.rs2, instr.imm);
+    logRegImm("sw", instr.rs2, instr.rs1, instr.imm);
     address_t addr = getReg(instr.rs1) + instr.imm;
     int32_t w = getReg(instr.rs2);
     memWrite(addr, &w, sizeof(w));
