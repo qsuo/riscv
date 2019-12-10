@@ -19,6 +19,7 @@ public:
     void execute(const Instruction& instr);
 
     void run();
+    void dump() {}
 //private:
     Riscv riscv;
     Decoder decoder;
