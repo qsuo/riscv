@@ -1,7 +1,6 @@
 
 #include <iostream>
 
-#include <cassert>
 #include <unistd.h>
 #include <fcntl.h>
 

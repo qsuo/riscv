@@ -2,6 +2,7 @@
 #ifndef __RISCV_H__
 #define __RISCV_H__
 
+#include <cassert>
 #include <iostream>
 #include <fstream>
 #include <iomanip>

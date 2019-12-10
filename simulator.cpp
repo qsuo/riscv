@@ -97,6 +97,9 @@ void Simulator::execute(const Instruction& instr)
 
 void Simulator::run()
 {
+    uint32_t num_executed = 0;
+    auto t_start = std::chrono::high_resolution_clock::now();
+
     //riscv.hart.pc = 65620;
     while(true)
     {
@@ -110,5 +113,12 @@ void Simulator::run()
         }
         Instruction instr = decode(encoding);
         execute(instr);
+        num_executed++;
     }
+
+    auto t_end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> t_total = t_end - t_start;
+
+    std::cout << "Total instructions: " << num_executed << std::endl
+              << "Total time: " << t_total.count() << " ms" << std::endl;
 }
