@@ -1,4 +1,3 @@
-#define DEF_INSTR(instr_name) void instr_name(const Instruction& instr) {}
 #define DECL_INSTR(instr_name) void instr_name(const Instruction& instr);
 
 /*  Integer register-immediate instructions  */
@@ -46,16 +45,23 @@ DECL_INSTR(sb)
 DECL_INSTR(sh)
 DECL_INSTR(sw)
 
-DEF_INSTR(fence)
-DEF_INSTR(fence_i)
-DEF_INSTR(ecall)
-DEF_INSTR(ebreak)
-DEF_INSTR(csrrw)
-DEF_INSTR(csrrs)
-DEF_INSTR(csrrc)
-DEF_INSTR(csrrwi)
-DEF_INSTR(csrrsi)
-DEF_INSTR(csrrci)
+#undef DECL_INSTR
 
-#undef DEF_INSTR
+#define DECL_INSTR(instr_name)                      \
+void instr_name(const Instruction& instr)           \
+{                                                   \
+    assert(0 && "Instruction not implemented");     \
+}
+
+DECL_INSTR(fence)
+DECL_INSTR(fence_i)
+DECL_INSTR(ecall)
+DECL_INSTR(ebreak)
+DECL_INSTR(csrrw)
+DECL_INSTR(csrrs)
+DECL_INSTR(csrrc)
+DECL_INSTR(csrrwi)
+DECL_INSTR(csrrsi)
+DECL_INSTR(csrrci)
+
 #undef DECL_INSTR
