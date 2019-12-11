@@ -20,8 +20,11 @@ simulator: decoder.o riscv.o hart.o memory.o log_service.o
 
 test: memory riscv decoder simulator
 
-main: riscv.o memory.o decoder.o simulator.o main.o log_service.o hart.o
+main: riscv.o memory.o decoder.o simulator.o main.o log_service.o hart.o basic_block.o
 	$(CC) $(CFLAGS) -o main $^ -lelf
+
+t: basic_block.o t.o riscv.o log_service.o hart.o memory.o
+	$(CC) $(CFALGS) -o t $^
 
 clean:
 	rm -rf *.o *.exe

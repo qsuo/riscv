@@ -135,7 +135,7 @@ Decoder::Decoding Decoder::getDecoding(uint32_t encoding)
 }
 
 
-Instruction Decoder::decode(uint32_t encoding)
+Instruction* Decoder::decode(uint32_t encoding)
 {
     Decoding decoding = getDecoding(encoding);
     Type type = instrType[decoding.opcode];
@@ -182,8 +182,9 @@ Instruction Decoder::decode(uint32_t encoding)
     {
         auto executor = instructions.at(decoding.opcode).at(instrKey);
          
-        Instruction instr(  encoding, executor, imm, decoding.rs1,
+        Instruction* instr = new Instruction(  encoding, executor, imm, decoding.rs1,
                         decoding.rs2, decoding.rd);
+        instr->type = decoding.opcode;
         return instr;
     }
     catch(...)

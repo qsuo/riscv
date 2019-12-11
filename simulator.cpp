@@ -12,6 +12,7 @@
 #include <string.h>
 #include <chrono>
 
+
 #include "simulator.h"
 
 void Simulator::load(const char* name)
@@ -79,6 +80,7 @@ void Simulator::load(const char* name)
     riscv.hart.pc = startPc;
 }
 
+/*
 uint32_t Simulator::fetch(address_t address)
 {
     uint32_t tmp = 0;
@@ -121,3 +123,63 @@ void Simulator::run()
     std::cout << "Total instructions: " << num_executed << std::endl
               << "Total time: " << t_total.count() << " ms" << std::endl;
 }
+*/
+
+BasicBlock* Simulator::getBasicBlock()
+{
+    BasicBlock* bb = NULL;
+    if(map.find(riscv.hart.pc) != map.end())
+    {
+        bb = map.at(riscv.hart.pc);
+
+        return bb;
+    }
+    else
+    {
+        bb = new BasicBlock;
+        bb->start = riscv.hart.pc;
+        uint32_t addr = riscv.hart.pc;
+        for(int i = 0; i < BasicBlock::BLOCK_SIZE; i++)
+        {
+            uint32_t encoding = 0;
+            if(addr > riscv.memory.getSize())
+                return NULL;
+            riscv.memory.read(addr, &encoding, 4);
+                           
+            Instruction* instr = decoder.decode(encoding);
+
+            bb->add(instr);
+
+            if(instr->type == decoder.BRANCH || instr->type == decoder.JAL)
+            {
+                //uint32_t new_pc = hart.getPc() + (instr.imm << 1);
+                addr = addr + (instr->imm << 1);
+                break;
+            }
+            else if(instr->type == decoder.JALR)
+            {
+                addr = (instr->rs1 + instr->imm) & ~0x1u;
+                break;
+            }
+            else
+                addr += 4;
+        }
+        bb->next = addr;
+        map[bb->start] = bb; 
+    }
+    return bb;
+}
+
+Simulator::~Simulator()
+{
+    for(auto bb : map)
+        delete bb.second;
+}
+
+void Simulator::execute(BasicBlock* bb)
+{
+    bb->execute(riscv);
+}
+
+
+

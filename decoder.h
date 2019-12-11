@@ -28,6 +28,13 @@ public:
         NONE
     };
 
+    enum JType
+    {
+        J_JALR,
+        J_BR,
+        J_JAL
+    };
+
     enum Opcode
     {
         OP_IMM =    0b0010011,
@@ -208,7 +215,7 @@ public:
 
     uint32_t applyMask(uint32_t raw, uint32_t mask);
     Decoding getDecoding(uint32_t encoding);
-    Instruction decode(uint32_t encoding);
+    Instruction* decode(uint32_t encoding);
 
 private:
     int findFirstUp(uint32_t raw);

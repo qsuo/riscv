@@ -11,7 +11,7 @@ class Instruction
 public:
 
     typedef void (Riscv::*Executor)(const Instruction& instr);
-
+    Instruction(){}
     Instruction(uint32_t encoding, Executor executor,
                 int32_t imm, uint8_t rs1, uint8_t rs2, uint8_t rd):
         encoding(encoding),
@@ -21,7 +21,7 @@ public:
         rd(rd),
         executor(executor)
     {}
-
+    int type;
     uint32_t encoding;
     int32_t imm;
     uint8_t rs1;
