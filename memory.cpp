@@ -20,13 +20,13 @@ Memory::~Memory()
 
 void Memory::read(address_t address, void* dst, std::size_t nbyte)
 {
-//    std::cerr << address << " " << size_  << " " << nbyte << "\n";
     assert((address < size_ + nbyte) && "Memory read out of bounds");
     std::memcpy(dst, &memory_[address], nbyte);
 }
 
 void Memory::write(address_t address, void* src, std::size_t nbyte)
 {
+    //std::cerr << std::hex << address << " " << size_  << " " << nbyte << "\n";
     assert((address < size_ + nbyte) && "Memory write out of bounds");
     std::memcpy(&memory_[address], src, nbyte);
 }

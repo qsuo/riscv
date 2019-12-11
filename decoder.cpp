@@ -25,45 +25,67 @@ uint32_t Decoder::applyMask(uint32_t raw, uint32_t mask)
     return (raw & mask) >> this->findFirstUp(mask);
 }
 
-int32_t Decoder::Decoding::getIImm()
-{
-    return (int32_t)I_imm11_0;
-}
+#define IMM12(x) (x & 0x800)
+#define IMM20(x) (x & 0x80000)
 
-int32_t Decoder::Decoding::getSImm()
+#define EX12(x) (x | (0xFFFFF << 12))
+#define EX20(x) (x | (0xFFF << 20))
+
+uint32_t Decoder::Decoding::getIImm()
 {
-    uint32_t imm4_0 = S_imm4_0;
-    uint32_t imm11_5 = S_imm11_5 << 5;
-    int32_t imm = imm4_0 | imm11_5;
+    uint32_t imm = I_imm11_0;
+    if(IMM12(imm))
+        imm = EX12(imm);
     return imm;
 }
 
-int32_t Decoder::Decoding::getBImm()
+
+uint32_t Decoder::Decoding::getSImm()
+{
+    uint32_t imm4_0 = S_imm4_0;
+    uint32_t imm11_5 = S_imm11_5 << 5;
+    uint32_t imm = imm4_0 | imm11_5;
+
+    if(IMM12(imm))
+        imm = EX12(imm);
+
+    return imm;
+}
+
+uint32_t Decoder::Decoding::getBImm()
 {
     uint32_t imm12 = B_imm12 << 11;
     uint32_t imm10_5 = B_imm10_5 << 4;
     uint32_t imm4_1 = B_imm4_1;
     uint32_t imm11 = B_imm11 << 10;
-    int32_t imm = imm4_1 | imm10_5 | imm11 | imm12;
+    uint32_t imm = imm4_1 | imm10_5 | imm11 | imm12;
+    if(IMM12(imm))
+        imm = EX12(imm);
     return imm;
 }
 
-int32_t Decoder::Decoding::getUImm()
+uint32_t Decoder::Decoding::getUImm()
 {
-    return (int32_t)U_imm31_12;
+
+    uint32_t imm = U_imm31_12;
+    if(IMM20(imm))
+        imm = EX20(imm);
+    return imm;
 }
 
-int32_t Decoder::Decoding::getJImm()
+uint32_t Decoder::Decoding::getJImm()
 {
     uint32_t imm10_1 = J_imm10_1;
     uint32_t imm11 = J_imm11 << 10;
     uint32_t imm19_12 = J_imm19_12 << 11;
     uint32_t imm20 = J_imm20 << 19;
-    int32_t imm = imm10_1 | imm11 | imm19_12 | imm20;
+    uint32_t imm = imm10_1 | imm11 | imm19_12 | imm20;
+    if(IMM20(imm))
+        imm = EX20(imm);
     return imm;
 }
 
-int32_t Decoder::Decoding::getImm(Type type)
+uint32_t Decoder::Decoding::getImm(Type type)
 {
     switch(type)
     {

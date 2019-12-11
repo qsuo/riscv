@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <chrono>
 
 #include "simulator.h"
 
@@ -26,7 +27,7 @@ void Simulator::load(const char* name)
         errx(EX_SOFTWARE, " ELF library initialization failed: %s ", elf_errmsg(-1));
 
     if ((fd = open(name, O_RDONLY, 0)) < 0)
-        err(EX_NOINPUT, " open \"%s \" failed ", "tmp");
+        err(EX_NOINPUT, " open \"%s \" failed ", name);
 
     if ((e = elf_begin(fd, ELF_C_READ, NULL)) == NULL)
         errx(EX_SOFTWARE, " elf_begin () failed: %s . ", elf_errmsg(-1));
@@ -101,16 +102,14 @@ void Simulator::run()
     auto t_start = std::chrono::high_resolution_clock::now();
 
     //riscv.hart.pc = 65620;
+    printf("0x%x\n", riscv.hart.pc);
     while(true)
     {
-
-        std::cerr << riscv.hart.pc << "\n\n";
-        uint32_t encoding = fetch(riscv.hart.pc);
-        if(encoding == 0)
-        {
-            riscv.hart.pc += 4;
+        //std::cout << std::hex << riscv.hart.pc << "\n";
+        //std::cerr << riscv.hart.pc << "\n\n";
+        if(riscv.hart.pc > riscv.memory.getSize())
             break;
-        }
+        uint32_t encoding = fetch(riscv.hart.pc);
         Instruction instr = decode(encoding);
         execute(instr);
         num_executed++;
